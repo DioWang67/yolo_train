@@ -1,0 +1,13 @@
+train: .D:/Git/robotlearning/yolo_train/split_dataset/train/images
+val: D:/Git/robotlearning/yolo_train/split_dataset/val/images
+test: D:/Git/robotlearning/yolo_train/split_dataset/images/test/images
+
+nc: 6
+names: ['Red', 'Green', 'Orange', 'Yellow', 'Black', 'Black1']
+
+roboflow:
+  workspace: pcb-kvjmo
+  project: cable-0h3zc
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/pcb-kvjmo/cable-0h3zc/dataset/1

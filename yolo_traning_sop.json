@@ -1,0 +1,182 @@
+以下是一份詳細的 YOLOv5 訓練和檢測 SOP（標準操作程序），包含使用 CPU 進行訓練的步驟：
+
+### 1. 環境準備
+
+#### 1.1 安裝依賴
+- 確保已安裝 `Python` 環境（建議使用 3.9 或以上）。
+- 在 YOLOv5 專案目錄下，安裝所需的依賴庫：
+```bash
+pip install -r requirements.txt
+```
+
+#### 1.2 下載 YOLOv5 專案
+- 使用 `git` 下載 YOLOv5 專案：
+```bash
+git clone https://github.com/ultralytics/yolov5.git
+cd yolov5
+```
+
+### 2. 數據集準備
+
+#### 2.1 創建數據集資料夾
+- 在 `YOLOv5` 專案根目錄下，創建 `data` 資料夾來存放圖片和標籤：
+```bash
+mkdir data
+```
+- 在 `data` 資料夾內創建 `images` 資料夾來存放圖片，並創建 `labels` 資料夾來存放對應的標註文件：
+```bash
+mkdir data/images
+mkdir data/labels
+```
+
+#### 2.2 數據集劃分
+- 根據訓練集和驗證集分別存放圖片。例如：
+  - `data/images/train/`
+  - `data/images/val/`
+  - `data/labels/train/`
+  - `data/labels/val/`
+
+#### 2.3 標籤文件格式 (command:LabelImg)
+- 標籤文件應為 `.txt` 格式，文件名與對應圖片的文件名一致，內容為：
+```txt
+<類別標籤> <x_center> <y_center> <width> <height>
+```
+- 類別標籤為整數，`x_center`, `y_center`, `width`, `height` 為相對座標，範圍介於 0 到 1 之間。
+
+### 3. 配置 YAML 文件
+
+#### 3.1 創建數據集配置文件
+- 在 `data` 資料夾下創建 `dataset.yaml` 文件，定義數據集路徑和類別名稱。例如：
+```yaml
+train: data/images/train
+val: data/images/val
+
+nc: 1  # 類別數量
+names: ['class_name']  # 類別名稱
+```
+
+### 4. 開始訓練
+
+#### 4.1 設定訓練參數
+- 使用以下命令進行訓練，指定模型權重、數據集、圖像大小等參數：
+```bash
+python train.py --img 640 --batch 16 --epochs 50 --data data/dataset.yaml --weights yolov5s.pt --device cpu
+```
+python train.py --img 640 --batch 16 --epochs 100 --data data.yaml --weights yolov5s.pt --device cpu
+python train.py --img 640 --batch 16 --epochs 100 --data /mnt/data/data.yaml --weights yolov5s.pt --device 0
+
+- 參數說明：
+  - `--img`: 圖像大小，預設為 640。
+  - `--batch`: 批次大小，根據硬體性能調整。
+  - `--epochs`: 訓練輪數。
+  - `--data`: 數據集配置文件的路徑。  - `--weights`: 使用的預訓練模型路徑，例如 `yolov5s.pt`。
+  - `--device`: 指定運行設備，如 `cpu` 或 `cuda:0`。
+
+#### 4.2 監控訓練過程
+- 訓練過程中的日誌會顯示在終端，包含損失值、mAP 等指標。訓練結果將保存於 `runs/train/expX` 目錄中。
+
+### 5. 模型驗證與檢測
+
+#### 5.1 驗證模型
+- 使用以下命令驗證模型性能，查看 mAP50 等指標：
+```bash
+python val.py --weights runs/train/expX/weights/best.pt --data data/dataset.yaml --img 640
+```
+
+#### 5.2 使用攝像頭進行實時檢測
+- 使用攝像頭進行實時檢測，運行以下命令：
+```bash
+python detect.py --weights runs/train/expX/weights/best.pt --source 0 --device cpu
+```
+
+- `--source` 可以指定輸入源：
+  - `0` 表示使用攝像頭。
+  - `path/to/video` 表示視頻文件。
+  - `path/to/images` 表示圖片文件夾。
+
+### 6. 檢測結果分析
+
+- 檢查 `runs/detect/expX/` 資料夾，內含檢測結果的圖片或視頻。
+- 如果選擇保存 `.txt` 或 `.csv` 文件，則檢測框的座標和類別將保存在 `runs/detect/expX/labels/` 資料夾中。
+
+### 7. 自定義訓練流程
+
+#### 7.1 調整數據集
+- 為新的項目創建新的 `dataset.yaml` 文件，調整類別數量 `nc` 和類別名稱 `names`。
+
+#### 7.2 調整超參數
+- 可以通過修改 `train.py` 中的學習率、優化器等超參數來微調模型，提升性能。
+
+### 常見問題
+
+1. **如果硬體資源有限**：可以選擇使用 `cpu` 進行訓練和推理，但速度會較慢。
+2. **小數據集情況**：如果數據集較小，建議增加數據增強技術或提高訓練輪數。
+
+
+在 YOLO 訓練過程中，會顯示許多參數和數據，這些參數是訓練過程中的指標或模型性能的度量。以下是訓練過程中常見的參數及其代表的意思：
+
+### 1. **Epoch**  
+   - **解釋**：表示模型已經完成的訓練週期數。每個 epoch 表示模型已經看過完整的訓練數據集一次。  
+   - **例子**：`50/100` 表示模型已經訓練了 50 個 epoch，總共會訓練 100 個。
+
+### 2. **GPU_mem**  
+   - **解釋**：顯示 GPU 的記憶體使用情況。這個參數會在使用 GPU 訓練時顯示。它告訴你訓練時占用了多少 GPU 記憶體（通常以 GB 為單位）。
+   - **例子**：`0G` 表示不使用 GPU，`4.5G` 表示使用了 4.5 GB 的 GPU 記憶體。
+
+### 3. **box_loss (Bounding Box Loss)**  
+   - **解釋**：邊界框損失，表示 YOLO 模型在預測物體邊界框時的誤差。這個損失越小，模型預測的框與真實的框越接近。
+   - **例子**：`0.045` 表示模型在這個 epoch 的邊界框損失為 0.045。
+
+### 4. **obj_loss (Objectness Loss)**  
+   - **解釋**：物體損失，指的是模型對物體存在性進行預測時的誤差。該值衡量模型是否正確地判斷每個預測框中是否存在物體。
+   - **例子**：`0.023` 表示模型在預測某個區域是否有物體時的損失為 0.023。
+
+### 5. **cls_loss (Class Loss)**  
+   - **解釋**：類別損失，表示模型在分類物體時的誤差。這個值表示模型在判斷物體屬於哪個類別時的準確性。
+   - **例子**：`0.010` 表示模型在分類物體時的損失為 0.010。
+
+### 6. **Instances**  
+   - **解釋**：表示在該 batch（小批次）中檢測到的物體實例數量。這是 YOLO 檢測到的物體總數。
+   - **例子**：`45` 表示在這個 batch 中，YOLO 模型檢測到了 45 個物體。
+
+### 7. **Size**  
+   - **解釋**：每張輸入影像的大小（高度和寬度）。YOLO 模型會將影像縮放到指定大小進行處理，通常為固定大小，例如 `(640, 640)`。
+   - **例子**：`640` 表示每張圖片被縮放到 640x640 像素。
+
+### 8. **P (Precision)**  
+   - **解釋**：精確率，表示模型檢測到的正確物體與所有預測物體的比例。這個數值越高，表示模型誤檢測的次數越少。
+   - **公式**：`Precision = TP / (TP + FP)`，其中 TP 是真陽性，FP 是假陽性。
+   - **例子**：`0.824` 表示精確率為 82.4%。
+
+### 9. **R (Recall)**  
+   - **解釋**：召回率，表示模型檢測到的正確物體與所有應該檢測到的物體的比例。這個數值越高，表示模型漏檢的次數越少。
+   - **公式**：`Recall = TP / (TP + FN)`，其中 TP 是真陽性，FN 是假陰性。
+   - **例子**：`0.02` 表示召回率為 2%，模型可能存在較多漏檢。
+
+### 10. **mAP50 (Mean Average Precision at IoU 0.50)**  
+   - **解釋**：平均精度（mAP），用來衡量模型的整體性能。`mAP50` 是指在 IOU（Intersection over Union）閾值為 0.50 時的平均精度。數值越高，表示模型性能越好。
+   - **例子**：`0.0426` 表示在 IOU 閾值 0.50 時的 mAP 為 4.26%。
+
+### 11. **mAP50-95**  
+   - **解釋**：平均精度（mAP）在不同 IOU 閾值（從 0.50 到 0.95，以 0.05 為間隔）下的平均值。這是一個更嚴格的衡量標準，越接近 1 越好。
+   - **例子**：`0.00738` 表示在不同 IOU 閾值下的 mAP 為 0.738%。
+
+### 12. **Classes**  
+   - **解釋**：每個類別的名稱。這裡列出了每個類別的訓練情況，包括它們的精確率、召回率、mAP 等。
+
+### 13. **Fusing layers...**
+   - **解釋**：YOLO 模型在進行推理之前，會將某些層進行融合以提升推理效率。這是一個模型優化步驟。
+
+### 14. **lr (Learning Rate)**  
+   - **解釋**：學習率，表示模型每次更新權重時，權重變化的步伐。學習率過高會導致模型不收斂，而過低則會使收斂速度變慢。
+
+### 15. **Total Loss**  
+   - **解釋**：總損失，是 `box_loss`、`obj_loss` 和 `cls_loss` 的綜合度量，表示模型訓練中的總誤差。
+
+---
+
+### 總結
+這些參數幫助你了解模型訓練的進度以及模型性能的度量。損失值（`box_loss`、`obj_loss`、`cls_loss`）越低，mAP、P、R 越高，代表模型性能越好。
+
+
+python val.py --data /path/to/data.yaml --weights /path/to/best.pt --task test --img 640
