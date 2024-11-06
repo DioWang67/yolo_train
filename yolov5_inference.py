@@ -1,12 +1,21 @@
+import os
+import sys
 import cv2
 import torch
+from color_verifier import ColorVerifier
+
+# 根據當前檔案的相對路徑動態添加 yolov5 的路徑
+current_dir = os.path.dirname(os.path.abspath(__file__))  # 取得當前檔案的路徑
+yolov5_path = os.path.join(current_dir, 'yolov5')         # yolov5 資料夾的相對路徑
+sys.path.insert(0, yolov5_path)                           # 將 yolov5 路徑添加到 sys.path
+
+# 匯入 yolov5 模組
 from utils.general import non_max_suppression, scale_boxes
 from models.common import DetectMultiBackend
 from utils.plots import Annotator, colors
-import os
 
 # 絕對路徑指定 default.yaml 的位置
-config_path = 'D:/Git/robotlearning/yoloface/env/Lib/site-packages/ultralytics/cfg/default.yaml'
+config_path = None
 
 # 預期的顏色順序
 expected_color_order = ["Red", "Green", "Orange", "Yellow", "Black", "Black1"]
@@ -24,7 +33,7 @@ def preprocess_image(frame, device):
     im /= 255.0
     return im
 
-def process_predictions(pred, im, frame, names, conf_thres, iou_thres):
+def process_predictions(pred, im, frame, names, conf_thres, iou_thres , color_verifier):
     pred = non_max_suppression(pred, conf_thres, iou_thres)
     detections = []
     annotator = Annotator(frame, line_width=3, example=str(names))
@@ -44,11 +53,20 @@ def process_predictions(pred, im, frame, names, conf_thres, iou_thres):
 
                 # 檢查是否與已有的框重疊過多
                 box = [int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3])]
+
+                # 使用顏色驗證器驗證顏色
+                verified_color, verified_conf = color_verifier.verify_color(frame, box)
+                
+                if verified_color is not None and verified_color[0] != color_name:
+                    print(f"顏色校正: {color_name} -> {verified_color[0]}")
+                    color_name = verified_color[0]
+                    conf = verified_conf
                 overlapping = False
                 for det_box in detections:
                     if iou(box, det_box['box']) > overlapping_threshold:
                         overlapping = True
                         break
+
 
                 # 如果重疊過多，則跳過該框
                 if overlapping:
@@ -153,7 +171,8 @@ def check_color_order(detections):
 
 def run_inference(weights='yolov5s.pt', source=0, device='cpu', conf_thres=0.25, iou_thres=0.45):
     model, stride, names, imgsz = load_model(weights, device, config_path)
-    
+    color_verifier = ColorVerifier()
+
     if isinstance(source, int):
         cap = cv2.VideoCapture(source)
         if not cap.isOpened():
@@ -171,7 +190,7 @@ def run_inference(weights='yolov5s.pt', source=0, device='cpu', conf_thres=0.25,
             im = preprocess_image(frame, device)
             with torch.no_grad():
                 pred = model(im)
-            result_frame, detections = process_predictions(pred, im, frame, names, conf_thres, iou_thres)
+            result_frame, detections = process_predictions(pred, im, frame, names, conf_thres, iou_thres, color_verifier)
             
             # 模擬多次檢測，這裡僅進行一次評估
             avg_scores = {det['label']: det['confidence'] for det in detections}
@@ -200,4 +219,4 @@ def run_inference(weights='yolov5s.pt', source=0, device='cpu', conf_thres=0.25,
         cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    run_inference(weights='yolo5best.pt', source=1, device='cpu', conf_thres=0.5, iou_thres=0.3)
+    run_inference(weights='yolov5s.pt', source=0, device='cpu', conf_thres=0.5, iou_thres=0.3)
