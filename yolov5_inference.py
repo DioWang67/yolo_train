@@ -54,13 +54,13 @@ def process_predictions(pred, im, frame, names, conf_thres, iou_thres , color_ve
                 # 檢查是否與已有的框重疊過多
                 box = [int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3])]
 
-                # 使用顏色驗證器驗證顏色
-                verified_color, verified_conf = color_verifier.verify_color(frame, box)
+                # # 使用顏色驗證器驗證顏色
+                # verified_color, verified_conf = color_verifier.verify_color(frame, box)
                 
-                if verified_color is not None and verified_color[0] != color_name:
-                    print(f"顏色校正: {color_name} -> {verified_color[0]}")
-                    color_name = verified_color[0]
-                    conf = verified_conf
+                # if verified_color is not None and verified_color[0] != color_name:
+                #     print(f"顏色校正: {color_name} -> {verified_color[0]}")
+                #     color_name = verified_color[0]
+                #     conf = verified_conf
                 overlapping = False
                 for det_box in detections:
                     if iou(box, det_box['box']) > overlapping_threshold:
