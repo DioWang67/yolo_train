@@ -99,7 +99,10 @@ class DataAugmentor:
         ops_config = aug_config['operations']
         
         aug_list = []
-        
+
+        aug_list.append(A.PadIfNeeded(min_height=1280, min_width=1280, border_mode=cv2.BORDER_CONSTANT, value=0))
+        aug_list.append(A.Resize(height=1280, width=1280))
+
         # 建立增強操作列表
         if ops_config.get('flip'):
             aug_list.append(A.HorizontalFlip(p=ops_config['flip']['probability']))
@@ -253,7 +256,7 @@ class DataAugmentor:
 
 def main():
     parser = argparse.ArgumentParser(description='數據增強工具')
-    parser.add_argument('--config', type=str, help='配置文件路徑')
+    parser.add_argument('--config', type=str, default='config.yaml', help='配置文件路徑')
     args = parser.parse_args()
 
     augmentor = DataAugmentor(args.config)
@@ -261,6 +264,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
     # python YOLOAutoAnnotator.py --config config.yaml

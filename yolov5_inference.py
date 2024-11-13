@@ -2,7 +2,7 @@ import os
 import sys
 import cv2
 import torch
-from color_verifier import ColorVerifier
+import numpy as np 
 
 # 根據當前檔案的相對路徑動態添加 yolov5 的路徑
 current_dir = os.path.dirname(os.path.abspath(__file__))  # 取得當前檔案的路徑
@@ -54,13 +54,7 @@ def process_predictions(pred, im, frame, names, conf_thres, iou_thres , color_ve
                 # 檢查是否與已有的框重疊過多
                 box = [int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3])]
 
-                # # 使用顏色驗證器驗證顏色
-                # verified_color, verified_conf = color_verifier.verify_color(frame, box)
-                
-                # if verified_color is not None and verified_color[0] != color_name:
-                #     print(f"顏色校正: {color_name} -> {verified_color[0]}")
-                #     color_name = verified_color[0]
-                #     conf = verified_conf
+
                 overlapping = False
                 for det_box in detections:
                     if iou(box, det_box['box']) > overlapping_threshold:
@@ -165,11 +159,44 @@ def setup_camera(cap):
     cap.set(cv2.CAP_PROP_GAMMA, 64)
 
 
+def get_centroid(box):
+    x1, y1, x2, y2 = box
+    return ((x1 + x2) // 2, (y1 + y2) // 2)
+
 def check_color_order(detections):
-    detected_colors = [d['label'] for d in detections]
+    if len(detections) < 2:
+        # 當檢測結果不足以判斷順序時，直接返回 False 或其他適當結果
+        print("檢測結果不足，無法判斷顏色順序")
+        return False
+
+    # 計算每個檢測框的質心
+    centroids = [get_centroid(d['box']) for d in detections]
+    centroids = np.array(centroids)
+
+    # 使用PCA找出主要方向
+    mean = np.mean(centroids, axis=0)
+    centered = centroids - mean
+    cov_matrix = np.cov(centered.T)
+    
+    # 檢查協方差矩陣是否為0維或存在無效值
+    if cov_matrix.ndim < 2 or np.isnan(cov_matrix).any():
+        print("協方差矩陣無效，無法計算主成分")
+        return False
+
+    eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
+    principal_axis = eigenvectors[:, np.argmax(eigenvalues)]
+
+    # 沿著主要方向投影質心，並根據投影結果排序
+    projections = np.dot(centered, principal_axis)
+    sorted_indices = np.argsort(projections)
+    sorted_detections = [detections[i] for i in sorted_indices]
+
+    # 比對排序結果是否符合預期順序
+    detected_colors = [d['label'] for d in sorted_detections]
     return detected_colors == expected_color_order
 
-def run_inference(weights='yolov5s.pt', source=0, device='cpu', conf_thres=0.25, iou_thres=0.45):
+
+def run_inference(weights='best.pt', source=0, device='cuda', conf_thres=0.25, iou_thres=0.45):
     model, stride, names, imgsz = load_model(weights, device, config_path)
     color_verifier = ColorVerifier()
 
@@ -219,4 +246,4 @@ def run_inference(weights='yolov5s.pt', source=0, device='cpu', conf_thres=0.25,
         cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    run_inference(weights='yolov5s.pt', source=0, device='cpu', conf_thres=0.5, iou_thres=0.3)
+    run_inference(weights='best.pt', source=0, device=torch.device('cuda'), conf_thres=0.8, iou_thres=0.3)
