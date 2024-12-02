@@ -1,4 +1,4 @@
-name: D:\Git\robotlearning\yoloface\env
+name: yolo_train_env
 channels:
   - pytorch
   - defaults
@@ -37,7 +37,6 @@ dependencies:
   - networkx=3.2.1=py39haa95532_0
   - openjpeg=2.5.2=hae555c5_0
   - openssl=3.0.15=h827c3e9_0
-  - pillow=10.4.0=py39h827c3e9_0
   - pip=24.2=py39haa95532_0
   - pysocks=1.7.1=py39haa95532_0
   - python=3.9.19=h1aa4202_1
@@ -67,11 +66,13 @@ dependencies:
       - aioresponses==0.7.6
       - aiortc==1.9.0
       - aiosignal==1.3.1
-      - albucore==0.0.17
-      - albumentations==1.4.18
+      - albucore==0.0.20
+      - albumentations==1.4.21
       - altgraph==0.17.4
       - annotated-types==0.7.0
+      - anomalib==0.7.0
       - anthropic==0.34.2
+      - antlr4-python3-runtime==4.9.3
       - anyio==4.6.2.post1
       - apscheduler==3.10.1
       - async-timeout==4.0.3
@@ -99,8 +100,11 @@ dependencies:
       - distro==1.9.0
       - dnspython==2.7.0
       - docker==6.1.3
+      - docstring-parser==0.16
       - docutils==0.16
       - eel==0.17.0
+      - einops==0.8.0
+      - et-xmlfile==2.0.0
       - eval-type-backport==0.2.0
       - exceptiongroup==1.2.2
       - fastapi==0.110.3
@@ -108,6 +112,7 @@ dependencies:
       - fire==0.6.0
       - flatbuffers==24.3.25
       - fonttools==4.54.1
+      - freia==0.2
       - frozenlist==1.4.1
       - fsspec==2024.9.0
       - future==1.0.0
@@ -132,10 +137,11 @@ dependencies:
       - httpcore==1.0.6
       - httplib2==0.22.0
       - httpx==0.27.2
-      - huggingface-hub==0.25.1
+      - huggingface-hub==0.24.7
       - humanfriendly==10.0
       - ifaddr==0.2.0
       - imageio==2.35.1
+      - imgaug==0.4.0
       - imgviz==1.7.5
       - importlib-metadata==8.5.0
       - importlib-resources==6.4.5
@@ -143,13 +149,17 @@ dependencies:
       - iniconfig==2.0.0
       - jiter==0.6.1
       - jmespath==1.0.1
+      - joblib==1.4.2
+      - jsonargparse==4.34.0
       - jsonschema==4.23.0
       - jsonschema-specifications==2024.10.1
       - kiwisolver==1.4.7
+      - kornia==0.6.9
       - labelimg==1.8.6
       - labelme==5.5.0
       - lapx==0.5.10.post1
       - lazy-loader==0.4
+      - lightning-utilities==0.11.9
       - lxml==5.3.0
       - markdown==3.7
       - markdown-it-py==3.0.0
@@ -159,16 +169,19 @@ dependencies:
       - multidict==6.1.0
       - mypy-extensions==1.0.0
       - natsort==8.4.0
-      - numpy==1.26.4
+      - numpy==1.24.4
+      - omegaconf==2.3.0
       - onnxruntime==1.15.1
       - openai==1.51.2
       - opencv-python==4.9.0.80
       - opencv-python-headless==4.10.0.84
+      - openpyxl==3.1.5
       - packaging==24.1
       - pandas==2.2.3
       - pefile==2024.8.26
       - pendulum==3.0.0
       - piexif==1.1.3
+      - pillow==11.0.0
       - pluggy==1.5.0
       - prettytable==3.11.0
       - prometheus-client==0.21.0
@@ -189,6 +202,7 @@ dependencies:
       - pydantic-settings==2.5.2
       - pydot==3.0.2
       - pyee==12.0.0
+      - pyfiglet==1.0.2
       - pygments==2.18.0
       - pyinstaller==6.10.0
       - pyinstaller-hooks-contrib==2024.8
@@ -203,7 +217,9 @@ dependencies:
       - pytest-asyncio==0.21.1
       - python-dateutil==2.9.0.post0
       - python-dotenv==1.0.1
+      - pytorch-lightning==1.9.5
       - pytz==2024.2
+      - pywavelets==1.6.0
       - pywin32==308
       - pywin32-ctypes==0.2.3
       - qtpy==2.4.1
@@ -218,16 +234,19 @@ dependencies:
       - s3transfer==0.10.2
       - sahi==0.11.18
       - scikit-image==0.24.0
+      - scikit-learn==1.5.2
       - scipy==1.13.1
       - seaborn==0.13.2
       - setuptools==72.1.0
       - shapely==2.0.6
+      - simsimd==6.0.0
       - six==1.16.0
       - skypilot==0.5.0
       - smmap==5.0.1
       - sniffio==1.3.1
       - soupsieve==2.6
       - starlette==0.37.2
+      - stringzilla==3.10.7
       - structlog==24.4.0
       - supervision==0.22.0
       - tabulate==0.9.0
@@ -236,13 +255,17 @@ dependencies:
       - termcolor==2.4.0
       - terminaltables==3.1.10
       - thop==0.1.1-2209072238
+      - threadpoolctl==3.5.0
       - tifffile==2024.8.30
       - time-machine==2.16.0
+      - timm==0.6.12
       - tldextract==5.1.2
       - tokenizers==0.20.1
       - tomli==2.0.2
+      - torchmetrics==0.10.3
       - tqdm==4.66.5
       - typer==0.9.0
+      - typeshed-client==2.7.0
       - typing-inspect==0.9.0
       - tzdata==2024.2
       - tzlocal==5.2
@@ -255,9 +278,9 @@ dependencies:
       - werkzeug==3.0.4
       - whichcraft==0.6.1
       - yarl==1.15.2
-      - yolov5==7.0.13
+      - yolov5==7.0.14
       - zipp==3.20.2
       - zope-event==5.0
       - zope-interface==7.0.3
       - zxing-cpp==2.2.0
-prefix: D:\Git\robotlearning\yoloface\env
+prefix: D:\Git\robotlearning\yolo_train\env

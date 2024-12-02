@@ -1,28 +1,28 @@
 input:
-  image_dir: "A/img"          # 輸入圖像目錄，包含需要進行數據增強的原始圖像
-  label_dir: "A/label"        # 輸入標籤目錄，對應於輸入圖像的標籤文件
+  image_dir: "target/result/data1"          # 輸入圖像目錄
+  label_dir: "target/result/data1"        # 輸入標籤目錄
   
 output:
   image_dir: "output/images"  # 增強後圖像的輸出目錄
   label_dir: "output/labels"  # 增強後標籤文件的輸出目錄
   
 augmentation:
-  num_images: 100             # 每張圖像生成 100 個增強版本，適合數據量較少的情況；如果數據量大，可以適當減少此數量
+  num_images: 100             # 每張圖像生成張數
   num_operations: [3, 5]      # 每次增強時隨機應用 3 到 5 個操作，增加增強的多樣性，同時避免過度增強
 
   operations:
     flip:
-      probability: 0          # 水平翻轉的概率為 0%，適合目標方向敏感的任務
+      probability: 0          # 水平翻轉概率  0%
     rotate:
-      angle: [-180, 180]      # 隨機旋轉角度範圍為 -180 到 180 度，用以模擬不同角度的拍攝情境
+      angle: [-30, 30]      # 隨機旋轉角度範圍為 -180 到 180 度
     multiply:
-      range: [0.8, 1.2]       # 亮度增強的範圍，將亮度調整到 0.8 倍至 1.2 倍，用於模擬不同光照條件
+      range: [0.8, 1.2]       # 亮度增強的範圍
     scale:
-      range: [0.8, 1.2]       # 縮放範圍，將圖像縮小至 0.8 倍或放大至 1.2 倍，適用於模擬目標尺寸的變化
+      range: [0.8, 1.2]       # 縮放範圍
     contrast:
-      range: [0.9, 1.1]       # 對比度調整範圍，用於模擬不同清晰度的場景，提高模型對不同對比度的適應性
+      range: [0.9, 1.1]       # 對比度調整範圍
     hue:
-      range: [-1, 1]          # 色調調整範圍為 -1 到 1，用於模擬不同色彩環境下的場景
+      range: [-0, 0]          # 色調調整範圍為
     noise:
       scale: [0, 0.05]        # 高斯噪聲範圍，用於增強抗噪聲能力，模擬輕微的圖像干擾
     perspective:
