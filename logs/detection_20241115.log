@@ -1,0 +1,4 @@
+2024-11-15 14:09:49,819 - ERROR - 家更岿粇: [Errno 2] No such file or directory: 'best.pt'
+2024-11-15 14:10:11,005 - ERROR - 家更岿粇: [Errno 2] No such file or directory: 'best.pt'
+2024-11-15 14:13:19,249 - ERROR - 家更岿粇: [Errno 2] No such file or directory: 'D:\\Git\\robotlearning\\yolo_inference\\weights\\best.pt'
+2024-11-15 14:15:16,783 - ERROR - 家更岿粇: name 'model' is not defined
